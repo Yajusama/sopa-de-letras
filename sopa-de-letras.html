@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sopa de Letras - Niveles</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #f9f5f2;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      color: #333;
+      user-select: none;
+    }
+    h1 {
+      margin-bottom: 15px;
+      color: #d2691e;
+      user-select: none;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(7, 60px);
+      justify-content: center;
+      gap: 6px;
+      margin: 0 auto 25px;
+      background-color: #FFF3E0;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(255, 183, 77, 0.5);
+      max-width: fit-content;
+      user-select: none;
+    }
+    .cell {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border: 2px solid #F6BD60;
+      font-size: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 8px;
+      user-select: none;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .cell.selected {
+      background-color: #ffd54f;
+      color: #5d4037;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+    .cell.found {
+      background-color: #4caf50;
+      color: white;
+      cursor: default;
+      user-select: none;
+    }
+    .word-list {
+      margin-top: 15px;
+      background-color: #fff8e1;
+      padding: 15px 30px;
+      border-radius: 15px;
+      display: inline-block;
+      user-select: none;
+      font-size: 1.6rem;
+      color: #5d4037;
+    }
+    .word-list .word {
+      margin: 8px 12px;
+      display: inline-block;
+      font-weight: 600;
+      user-select: none;
+    }
+    .word-list .word.found {
+      text-decoration: line-through;
+      color: #4caf50;
+      font-weight: bold;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 25px;
+      font-size: 1.1rem;
+      border: none;
+      background-color: #d2691e;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #a0522d;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="levelTitle">Sopa de Letras - Nivel 1</h1>
+  <div class="board" id="board"></div>
+  <div class="word-list" id="wordList"></div>
+  <button id="repeatAudioBtn" style="display:none;">🔊 Repetir palabra</button>
+
+  <script>
+    const levels = [
+      { name: "Animales", words: ["GATO", "PERRO", "LEON", "PATO", "RATA"], color: "#FFF3E0" },
+      { name: "Números", words: ["UNO", "DOS", "TRES", "CUATRO", "CINCO"], color: "#E1F5FE" },
+      { name: "Colores", words: ["ROJO", "AZUL", "VERDE", "NEGRO", "BLANCO"], color: "#F3E5F5" },
+      { name: "Frutas", words: ["PERA", "UVA", "LIMA", "NARANJA", "KIWI"], color: "#FFF9C4" },
+      { name: "Objetos", words: ["SILLA", "MESA", "LAPIZ", "RELOJ", "LIBRO"], color: "#FFE0B2" },
+      { name: "Países", words: ["CHILE", "PERU", "MEXICO", "CUBA", "ARGENTINA"], color: "#E1BEE7" },
+      { name: "Cuerpos", words: ["CABEZA", "BRAZO", "PIERNA", "OJO", "BOCA"], color: "#FFECB3" },
+      { name: "Comida", words: ["ARROZ", "POLLO", "CARNE", "PAN", "QUESO"], color: "#FFCDD2" },
+      { name: "Ropa", words: ["CAMISA", "PANTALON", "ZAPATO", "SOMBRERO", "BUFANDA"], color: "#D1C4E9" },
+      { name: "Familia", words: ["MADRE", "PADRE", "HERMANO", "ABUELO", "TIO"], color: "#C8E6C9" },
+      { name: "Escuela", words: ["MAESTRO", "ALUMNO", "CLASE", "LIBRO", "EXAMEN"], color: "#BBDEFB" },
+      { name: "Animales 2", words: ["OSO", "ZORRO", "RANA", "CABALLO", "PEZ"], color: "#FFE082" },
+      { name: "Verduras", words: ["LECHUGA", "TOMATE", "ZANAHORIA", "CEBOLLA", "PAPA"], color: "#DCEDC8" },
+      { name: "Partes del Día", words: ["MAÑANA", "TARDE", "NOCHE", "AMANECE", "ATARDECER"], color: "#F8BBD0" },
+      { name: "Sentimientos", words: ["FELIZ", "TRISTE", "ENOJO", "MIEDO", "AMOR"], color: "#E6EE9C" },
+      { name: "Medios de transporte", words: ["AUTO", "TREN", "BARCO", "AVION", "BICI"], color: "#B2EBF2" },
+      { name: "Naturaleza", words: ["SOL", "LLUVIA", "NUBE", "RIO", "MONTAÑA"], color: "#DCEDC8" },
+      { name: "Profesiones", words: ["DOCTOR", "ABOGADO", "INGENIERO", "MAESTRO", "POLICIA"], color: "#F3E5F5" },
+      { name: "Deportes", words: ["FUTBOL", "TENIS", "BASQUET", "GOLF", "NATACION"], color: "#C5CAE9" },
+      { name: "Tecnología", words: ["CELULAR", "COMPUTADORA", "INTERNET", "TECLADO", "MOUSE"], color: "#F0F4C3" },
+      { name: "Instrumentos", words: ["GUITARRA", "PIANO", "VIOLIN", "TAMBOR", "FLAUTA"], color: "#E1F5FE" },
+      { name: "Oficios", words: ["PANADERO", "CARPINTERO", "ELECTRICISTA", "JARDINERO", "PINTOR"], color: "#FFECB3" },
+      { name: "Animales 3", words: ["TIGRE", "ELEFANTE", "JIRAFA", "CANGURO", "PINGUINO"], color: "#D7CCC8" },
+      { name: "Lugares", words: ["CIUDAD", "PLAYA", "BOSQUE", "DESIERTO", "MONTE"], color: "#FFCCBC" },
+      { name: "Clima", words: ["CALOR", "FRIO", "HUMEDAD", "VIENTO", "TORMENTA"], color: "#B3E5FC" },
+      { name: "Tiempo", words: ["SEGUNDO", "MINUTO", "HORA", "DIA", "SEMANA"], color: "#D1C4E9" },
+      { name: "Emociones", words: ["SORPRESA", "CURIOSIDAD", "ALEGRIA", "TRISTEZA", "RABIA"], color: "#FFF9C4" },
+      { name: "Valores", words: ["RESPETO", "HONESTIDAD", "SOLIDARIDAD", "JUSTICIA", "LIBERTAD"], color: "#FFECB3" },
+      { name: "Lenguaje", words: ["PALABRA", "ORACION", "LECTURA", "ESCRITURA", "CUENTO"], color: "#E0F7FA" },
+      { name: "Matemáticas", words: ["SUMA", "RESTA", "MULTIPLICA", "DIVIDE", "NUMERO"], color: "#FFCCBC" },
+      { name: "Ciencia", words: ["EXPERIMENTO", "MATERIA", "ENERGIA", "FUERZA", "MOVIMIENTO"], color: "#F3E5F5" },
+      { name: "Historia", words: ["PASADO", "GUERRA", "PAZ", "INDEPENDENCIA", "REVOLUCION"], color: "#FFCDD2" },
+      { name: "Geografía", words: ["MAPA", "CONTINENTE", "OCEANO", "PAIS", "CIUDAD"], color: "#C8E6C9" },
+      { name: "Arte", words: ["PINTURA", "ESCULTURA", "DIBUJO", "COLOR", "ARTISTA"], color: "#FCE4EC" },
+      { name: "Fiestas", words: ["NAVIDAD", "CUMPLEAÑOS", "FIESTA", "BAILE", "JUEGO"], color: "#D7CCC8" }
+    ];
+  </script>
+</body>
+</html>
+
