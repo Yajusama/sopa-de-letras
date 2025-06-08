@@ -1,345 +1,344 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sopa de Letras - Niveles</title>
-  <style>
-    body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: url('https://img.freepik.com/vector-gratis/fondo-patron-caricatura-dibujada-mano_23-2148997847.jpg') no-repeat center center fixed;
-      background-size: cover;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-      color: #333;
-    }
-    h1 {
-      background-color: rgba(255, 255, 255, 0.8);
-      display: inline-block;
-      padding: 10px 20px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-    .board {
-      display: grid;
-      justify-content: center;
-      gap: 5px;
-      margin: 0 auto 20px;
-      background-color: rgba(255, 255, 255, 0.9);
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      max-width: fit-content;
-    }
-    .cell {
-      width: 40px;
-      height: 40px;
-      background: white;
-      border: 2px solid #ccc;
-      font-size: 1.4rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-      user-select: none;
-    }
-    .cell:hover:not(.found) {
-      transform: scale(1.1);
-    }
-    .cell.selected {
-      background: #ffcc00;
-      color: black;
-      border-color: #f90;
-      text-decoration: underline;
-      font-weight: bold;
-    }
-    .cell.found {
-      background: #4CAF50 !important;
-      color: white !important;
-      border-color: #388E3C !important;
-      text-decoration: underline;
-      font-weight: bold;
-      cursor: default;
-    }
-    .word-list {
-      margin-top: 20px;
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 15px 20px;
-      border-radius: 10px;
-      display: inline-block;
-      min-width: 250px;
-    }
-    .word {
-      display: inline-block;
-      margin: 10px 15px;
-      font-size: 1.2rem;
-      user-select: none;
-    }
-    .word.found-word {
-      color: #4CAF50;
-      text-decoration: line-through;
-      font-weight: bold;
-    }
-    #levelButtons {
-      margin-bottom: 20px;
-    }
-    #levelButtons button {
-      margin: 0 5px;
-      padding: 8px 16px;
-      font-size: 1rem;
-      cursor: pointer;
-      border-radius: 8px;
-      border: none;
-      background-color: #2196F3;
-      color: white;
-      transition: background-color 0.3s;
-    }
-    #levelButtons button:hover {
-      background-color: #1769aa;
-    }
-    #message {
-      font-size: 1.3rem;
-      margin-top: 20px;
-      font-weight: bold;
-      color: #4CAF50;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sopa de Letras - 5 Niveles</title>
+<style>
+  body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    margin: 0; padding: 20px; text-align: center; color: #333;
+    transition: background-color 0.8s ease;
+    user-select: none;
+  }
+  h1 {
+    display: inline-block;
+    padding: 10px 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    margin-bottom: 20px;
+  }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(6, 45px);
+    justify-content: center;
+    gap: 8px;
+    margin: 0 auto 25px;
+    background-color: #FFF3E0;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(255, 183, 77, 0.5);
+    max-width: fit-content;
+  }
+  .cell {
+    width: 45px; height: 45px;
+    background: white;
+    border: 2px solid #F6BD60;
+    font-size: 1.6rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+  .cell.highlighted {
+    background: #FFD54F;
+    border-color: #FFB300;
+    color: #5D4037;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  .cell.found {
+    background: #4CAF50 !important;
+    color: white !important;
+    cursor: default;
+  }
+  .word-list {
+    background-color: #FFE4C4;
+    padding: 15px 25px;
+    border-radius: 15px;
+    display: inline-block;
+    box-shadow: 0 0 10px #f3bca1;
+    margin-bottom: 30px;
+  }
+  .word {
+    display: inline-block;
+    margin: 10px 18px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #6D4C41;
+  }
+  .word.found {
+    text-decoration: line-through;
+    color: #388E3C;
+  }
+  /* Colores para cada nivel */
+  body.level1 { background-color: #F7E6D9; }
+  body.level1 h1 { background-color: #FFD6BA; color: #6D4C41; }
+  body.level1 .board { background-color: #FFF3E0; border-color: #F6BD60; }
+  body.level1 .cell { border-color: #F6BD60; }
+
+  body.level2 { background-color: #D0E6A5; }
+  body.level2 h1 { background-color: #B6D7A8; color: #386641; }
+  body.level2 .board { background-color: #E5F0B3; border-color: #A3C78D; }
+  body.level2 .cell { border-color: #A3C78D; }
+
+  body.level3 { background-color: #A4D4FF; }
+  body.level3 h1 { background-color: #7EB9FF; color: #264D73; }
+  body.level3 .board { background-color: #CDE7FF; border-color: #7EB9FF; }
+  body.level3 .cell { border-color: #7EB9FF; }
+
+  body.level4 { background-color: #FFE0F0; }
+  body.level4 h1 { background-color: #FFB3D9; color: #6D3A59; }
+  body.level4 .board { background-color: #FFD1E6; border-color: #FF99CC; }
+  body.level4 .cell { border-color: #FF99CC; }
+
+  body.level5 { background-color: #E0FFF7; }
+  body.level5 h1 { background-color: #99F0E0; color: #31766F; }
+  body.level5 .board { background-color: #B3FFF1; border-color: #66E0D9; }
+  body.level5 .cell { border-color: #66E0D9; }
+</style>
 </head>
-<body>
-  <h1 id="title">Sopa de Letras - Animales</h1>
-  <div id="levelButtons">
-    <button onclick="changeLevel(0)">Nivel 1</button>
-    <button onclick="changeLevel(1)">Nivel 2</button>
-    <button onclick="changeLevel(2)">Nivel 3</button>
-  </div>
+<body class="level1">
+  <h1 id="title">Sopa de Letras - Nivel 1</h1>
   <div class="board" id="board"></div>
   <div class="word-list" id="wordList"></div>
-  <div id="message"></div>
 
-  <script>
-    const levels = [
-      {
-        name: "Animales",
-        size: 6,
-        words: ["GATO", "PERRO", "LEON", "RATA", "LORO"]
-      },
-      {
-        name: "Números",
-        size: 7,
-        words: ["UNO", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE"]
-      },
-      {
-        name: "Objetos",
-        size: 8,
-        words: ["LÁPIZ", "ESCRITORIO", "SILLA", "LIBRO", "BOLÍGRAFO"]
-      }
-    ];
+<script>
+  const levels = [
+    { title: "Animales Básicos", words: ["GATO", "PERRO", "LEON", "RATA", "OSO"], colorClass: "level1" },
+    { title: "Frutas", words: ["PERA", "LIMA", "KIWI", "UVA", "MELA"], colorClass: "level2" },
+    { title: "Colores", words: ["AZUL", "ROJO", "VERDE", "GRIS", "ORO"], colorClass: "level3" },
+    { title: "Partes del Cuerpo", words: ["MANO", "PIE", "OJO", "NARIZ", "BOCA"], colorClass: "level4" },
+    { title: "Objetos", words: ["LATA", "LIBRO", "PELO", "SILLA", "RELOJ"], colorClass: "level5" }
+  ];
 
-    let currentLevelIndex = 0;
-    let currentLevel = levels[currentLevelIndex];
-    let selectedCells = [];
-    let foundWords = new Set();
+  const boardSize = 6;
+  const board = document.getElementById("board");
+  const wordList = document.getElementById("wordList");
+  const title = document.getElementById("title");
 
-    const board = document.getElementById("board");
-    const wordList = document.getElementById("wordList");
-    const title = document.getElementById("title");
-    const message = document.getElementById("message");
+  let currentLevel = 0;
+  let isDragging = false;
+  let highlightedCells = [];
+  let foundWords = new Set();
 
-    function createEmptyBoard(size) {
-      return Array.from({ length: size }, () => Array(size).fill(""));
-    }
+  function createEmptyBoard(size) {
+    return Array.from({ length: size }, () => Array(size).fill(""));
+  }
 
-    function fillRandomLetters(grid) {
-      const letters = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZÁÉÍÓÚÜ";
-      return grid.map(row => row.map(cell => cell || letters[Math.floor(Math.random() * letters.length)]));
-    }
+  function fillRandomLetters(grid) {
+    const letters = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+    return grid.map(row => row.map(cell => cell || letters[Math.floor(Math.random() * letters.length)]));
+  }
 
-    function placeWords(grid, words) {
-      words.forEach((word, index) => {
-        let placed = false;
-        const upperWord = word.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
-        while (!placed) {
-          const vertical = index % 2 === 0;
-          const maxRow = vertical ? grid.length - upperWord.length : grid.length - 1;
-          const maxCol = vertical ? grid[0].length - 1 : grid[0].length - upperWord.length;
-          const row = Math.floor(Math.random() * (maxRow + 1));
-          const col = Math.floor(Math.random() * (maxCol + 1));
+  function placeWords(grid, words) {
+    words.forEach((word, index) => {
+      let placed = false;
+      let tries = 0;
+      while (!placed && tries < 100) {
+        const vertical = Math.random() > 0.5;
+        const maxRow = vertical ? grid.length - word.length : grid.length;
+        const maxCol = vertical ? grid[0].length : grid[0].length - word.length;
 
-          let canPlace = true;
-          for (let i = 0; i < upperWord.length; i++) {
+        const row = Math.floor(Math.random() * maxRow);
+        const col = Math.floor(Math.random() * maxCol);
+
+        let canPlace = true;
+        for (let i = 0; i < word.length; i++) {
+          const r = vertical ? row + i : row;
+          const c = vertical ? col : col + i;
+          if (grid[r][c] !== "") {
+            canPlace = false;
+            break;
+          }
+        }
+
+        if (canPlace) {
+          for (let i = 0; i < word.length; i++) {
             const r = vertical ? row + i : row;
             const c = vertical ? col : col + i;
-            if (grid[r][c] && grid[r][c] !== "" && grid[r][c] !== upperWord[i]) {
-              canPlace = false;
-              break;
-            }
+            grid[r][c] = word[i];
           }
-
-          if (canPlace) {
-            for (let i = 0; i < upperWord.length; i++) {
-              const r = vertical ? row + i : row;
-              const c = vertical ? col : col + i;
-              grid[r][c] = upperWord[i];
-            }
-            placed = true;
-          }
+          placed = true;
         }
+        tries++;
+      }
+    });
+  }
+
+  function renderBoard(grid) {
+    board.innerHTML = "";
+    grid.forEach((row, rIdx) => {
+      row.forEach((letter, cIdx) => {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.textContent = letter;
+        cell.dataset.row = rIdx;
+        cell.dataset.col = cIdx;
+
+        // Eventos para arrastrar mouse y touch
+        cell.addEventListener('mousedown', startDrag);
+        cell.addEventListener('mouseenter', dragOver);
+        cell.addEventListener('mouseup', endDrag);
+
+        cell.addEventListener('touchstart', startDrag);
+        cell.addEventListener('touchmove', dragOverTouch);
+        cell.addEventListener('touchend', endDrag);
+
+        board.appendChild(cell);
       });
+    });
+  }
+
+  function startDrag(e) {
+    e.preventDefault();
+    if (e.target.classList.contains('found')) return;
+    isDragging = true;
+    clearHighlights();
+    highlightCell(e.target);
+  }
+
+  function dragOver(e) {
+    e.preventDefault();
+    if (!isDragging) return;
+    if (e.target.classList.contains('found')) return;
+    if (highlightedCells.length > 0) {
+      const lastCell = highlightedCells[highlightedCells.length - 1];
+      if (!isNeighbor(lastCell, e.target)) return;
     }
+    highlightCell(e.target);
+  }
 
-    function renderBoard(grid) {
-      board.style.gridTemplateColumns = `repeat(${grid.length}, 40px)`;
-      board.innerHTML = "";
-      grid.forEach((row, rIdx) => {
-        row.forEach((letter, cIdx) => {
-          const cell = document.createElement("div");
-          cell.className = "cell";
-          cell.textContent = letter;
-          cell.dataset.row = rIdx;
-          cell.dataset.col = cIdx;
-          cell.onclick = () => selectCell(cell);
-          board.appendChild(cell);
-        });
-      });
+  function dragOverTouch(e) {
+    e.preventDefault();
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!elem || !elem.classList.contains('cell')) return;
+    if (elem.classList.contains('found')) return;
+    if (highlightedCells.length > 0) {
+      const lastCell = highlightedCells[highlightedCells.length - 1];
+      if (!isNeighbor(lastCell, elem)) return;
     }
+    highlightCell(elem);
+  }
 
-    function selectCell(cell) {
-      if (cell.classList.contains("found")) return; // no seleccionar ya encontradas
+  function endDrag(e) {
+    e.preventDefault();
+    if (!isDragging) return;
+    isDragging = false;
+    checkSelection();
+  }
 
-      const key = `${cell.dataset.row},${cell.dataset.col}`;
-      if (selectedCells.includes(key)) {
-        selectedCells = selectedCells.filter(c => c !== key);
-        cell.classList.remove("selected");
-      } else {
-        selectedCells.push(key);
-        cell.classList.add("selected");
-      }
-      checkWords();
+  function highlightCell(cell) {
+    if (!highlightedCells.includes(cell)) {
+      highlightedCells.push(cell);
+      cell.classList.add('highlighted');
     }
+  }
 
-    function checkWords() {
-      // Vamos a comprobar si alguna palabra está completamente seleccionada
-      for (const word of currentLevel.words) {
-        const upperWord = word.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+  function clearHighlights() {
+    highlightedCells.forEach(cell => cell.classList.remove('highlighted'));
+    highlightedCells = [];
+  }
 
-        // Buscamos posiciones de la palabra en el tablero (horizontal o vertical)
-        const positions = [];
+  function isNeighbor(cellA, cellB) {
+    const rA = parseInt(cellA.dataset.row);
+    const cA = parseInt(cellA.dataset.col);
+    const rB = parseInt(cellB.dataset.row);
+    const cB = parseInt(cellB.dataset.col);
 
-        for (let r = 0; r < currentLevel.size; r++) {
-          for (let c = 0; c < currentLevel.size; c++) {
-            // Horizontal
-            if (c + upperWord.length <= currentLevel.size) {
-              let match = true;
-              for (let i = 0; i < upperWord.length; i++) {
-                if (boardArray[r][c + i] !== upperWord[i]) {
-                  match = false;
-                  break;
-                }
-              }
-              if (match) {
-                positions.push(Array.from({length: upperWord.length}, (_, i) => `${r},${c + i}`));
-              }
-            }
-            // Vertical
-            if (r + upperWord.length <= currentLevel.size) {
-              let match = true;
-              for (let i = 0; i < upperWord.length; i++) {
-                if (boardArray[r + i][c] !== upperWord[i]) {
-                  match = false;
-                  break;
-                }
-              }
-              if (match) {
-                positions.push(Array.from({length: upperWord.length}, (_, i) => `${r + i},${c}`));
-              }
-            }
-          }
-        }
+    const dr = rB - rA;
+    const dc = cB - cA;
 
-        // Verificamos si alguna de las posiciones está completamente seleccionada
-        for (const posArray of positions) {
-          const found = posArray.every(pos => selectedCells.includes(pos));
-          if (found && !foundWords.has(upperWord)) {
-            // Marcamos la palabra como encontrada
-            foundWords.add(upperWord);
-            // Cambiar estilo de las celdas
-            posArray.forEach(pos => {
-              const [r,c] = pos.split(",");
-              const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
-              if (cell) {
-                cell.classList.add("found");
-                cell.classList.remove("selected");
-              }
-            });
-            // Cambiar estilo palabra lista
-            const wordElements = [...wordList.children];
-            for(const wEl of wordElements){
-              if(wEl.textContent === word){
-                wEl.classList.add("found-word");
-                break;
-              }
-            }
-            // Limpiar selección
-            selectedCells = [];
-            updateMessage();
-            checkLevelComplete();
-            return; // solo procesar una palabra por vez
-          }
-        }
-      }
-    }
+    return (dr === 0 && Math.abs(dc) === 1) || (dc === 0 && Math.abs(dr) === 1);
+  }
 
-    function updateMessage(){
-      message.textContent = `Palabras encontradas: ${foundWords.size} / ${currentLevel.words.length}`;
-    }
+  function getSelectedWord() {
+    return highlightedCells.map(cell => cell.textContent).join('');
+  }
 
-    function checkLevelComplete(){
-      if(foundWords.size === currentLevel.words.length){
-        if(currentLevelIndex < levels.length - 1){
+  function checkSelection() {
+    if (highlightedCells.length === 0) return;
+
+    const word = getSelectedWord();
+    const reversed = word.split('').reverse().join('');
+    const currentWords = levels[currentLevel].words;
+
+    if (currentWords.includes(word) || currentWords.includes(reversed)) {
+      if (!foundWords.has(word) && !foundWords.has(reversed)) {
+        markWordFound(word);
+        speakWord(word);
+        foundWords.add(word);
+        foundWords.add(reversed);
+        markWordInList(word);
+        markWordInList(reversed);
+        if (foundWords.size / 2 === currentWords.length) {
           setTimeout(() => {
-            alert(`¡Felicidades! Has completado el nivel ${currentLevelIndex + 1}. Pasando al siguiente nivel.`);
-            changeLevel(currentLevelIndex + 1);
-          }, 500);
-        } else {
-          setTimeout(() => {
-            alert("¡Felicidades! Has completado todos los niveles.");
-            message.textContent = "¡Juego completado! Gracias por jugar.";
-            board.innerHTML = "";
-            wordList.innerHTML = "";
-            title.textContent = "Juego terminado";
-          }, 500);
+            nextLevel();
+          }, 1000);
         }
       }
+    } else {
+      clearHighlights();
     }
+  }
 
-    function renderWordList() {
-      wordList.innerHTML = currentLevel.words.map(w => `<div class="word">${w}</div>`).join("");
+  function markWordFound(word) {
+    highlightedCells.forEach(cell => {
+      cell.classList.add('found');
+      cell.classList.remove('highlighted');
+      cell.style.cursor = 'default';
+    });
+    highlightedCells = [];
+  }
+
+  function markWordInList(word) {
+    [...wordList.children].forEach(div => {
+      if (div.textContent === word || div.textContent === word.split('').reverse().join('')) {
+        div.classList.add('found');
+      }
+    });
+  }
+
+  function speakWord(word) {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'es-ES';
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
     }
+  }
 
-    function changeLevel(levelIndex) {
-      currentLevelIndex = levelIndex;
-      currentLevel = levels[currentLevelIndex];
-      selectedCells = [];
-      foundWords = new Set();
-      message.textContent = "";
-      title.textContent = `Sopa de Letras - ${currentLevel.name}`;
+  function renderWordList() {
+    wordList.innerHTML = "";
+    levels[currentLevel].words.forEach(w => {
+      wordList.innerHTML += `<div class="word">${w}</div>`;
+    });
+  }
 
-      const emptyGrid = createEmptyBoard(currentLevel.size);
-      placeWords(emptyGrid, currentLevel.words);
-      boardArray = fillRandomLetters(emptyGrid);
-
-      renderBoard(boardArray);
-      renderWordList();
-      updateMessage();
+  function nextLevel() {
+    currentLevel++;
+    if (currentLevel >= levels.length) {
+      alert("¡Felicidades! Completaste todos los niveles.");
+      currentLevel = 0; // Reiniciar niveles
     }
+    foundWords.clear();
+    clearHighlights();
+    setupLevel();
+  }
 
-    // Inicializamos el juego en nivel 1
-    let boardArray;
-    changeLevel(0);
+  function setupLevel() {
+    document.body.className = levels[currentLevel].colorClass;
+    title.textContent = "Sopa de Letras - " + levels[currentLevel].title;
+    const emptyGrid = createEmptyBoard(boardSize);
+    placeWords(emptyGrid, levels[currentLevel].words);
+    const filledGrid = fillRandomLetters(emptyGrid);
+    renderBoard(filledGrid);
+    renderWordList();
+  }
 
-  </script>
+  setupLevel();
+</script>
 </body>
 </html>
 
