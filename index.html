@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sopa de Letras - Niveles</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: url('https://img.freepik.com/vector-gratis/fondo-patron-caricatura-dibujada-mano_23-2148997847.jpg') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      color: #333;
+    }
+    h1 {
+      background-color: rgba(255, 255, 255, 0.8);
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .board {
+      display: grid;
+      justify-content: center;
+      gap: 5px;
+      margin: 0 auto 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      max-width: fit-content;
+    }
+    .cell {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border: 2px solid #ccc;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      user-select: none;
+    }
+    .cell:hover:not(.found) {
+      transform: scale(1.1);
+    }
+    .cell.selected {
+      background: #ffcc00;
+      color: black;
+      border-color: #f90;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+    .cell.found {
+      background: #4CAF50 !important;
+      color: white !important;
+      border-color: #388E3C !important;
+      text-decoration: underline;
+      font-weight: bold;
+      cursor: default;
+    }
+    .word-list {
+      margin-top: 20px;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 15px 20px;
+      border-radius: 10px;
+      display: inline-block;
+      min-width: 250px;
+    }
+    .word {
+      display: inline-block;
+      margin: 10px 15px;
+      font-size: 1.2rem;
+      user-select: none;
+    }
+    .word.found-word {
+      color: #4CAF50;
+      text-decoration: line-through;
+      font-weight: bold;
+    }
+    #levelButtons {
+      margin-bottom: 20px;
+    }
+    #levelButtons button {
+      margin: 0 5px;
+      padding: 8px 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 8px;
+      border: none;
+      background-color: #2196F3;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    #levelButtons button:hover {
+      background-color: #1769aa;
+    }
+    #message {
+      font-size: 1.3rem;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="title">Sopa de Letras - Animales</h1>
+  <div id="levelButtons">
+    <button onclick="changeLevel(0)">Nivel 1</button>
+    <button onclick="changeLevel(1)">Nivel 2</button>
+    <button onclick="changeLevel(2)">Nivel 3</button>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="word-list" id="wordList"></div>
+  <div id="message"></div>
+
+  <script>
+    const levels = [
+      {
+        name: "Animales",
+        size: 6,
+        words: ["GATO", "PERRO", "LEON", "RATA", "LORO"]
+      },
+      {
+        name: "Números",
+        size: 7,
+        words: ["UNO", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE"]
+      },
+      {
+        name: "Objetos",
+        size: 8,
+        words: ["LÁPIZ", "ESCRITORIO", "SILLA", "LIBRO", "BOLÍGRAFO"]
+      }
+    ];
+
+    let currentLevelIndex = 0;
+    let currentLevel = levels[currentLevelIndex];
+    let selectedCells = [];
+    let foundWords = new Set();
+
+    const board = document.getElementById("board");
+    const wordList = document.getElementById("wordList");
+    const title = document.getElementById("title");
+    const message = document.getElementById("message");
+
+    function createEmptyBoard(size) {
+      return Array.from({ length: size }, () => Array(size).fill(""));
+    }
+
+    function fillRandomLetters(grid) {
+      const letters = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZÁÉÍÓÚÜ";
+      return grid.map(row => row.map(cell => cell || letters[Math.floor(Math.random() * letters.length)]));
+    }
+
+    function placeWords(grid, words) {
+      words.forEach((word, index) => {
+        let placed = false;
+        const upperWord = word.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+        while (!placed) {
+          const vertical = index % 2 === 0;
+          const maxRow = vertical ? grid.length - upperWord.length : grid.length - 1;
+          const maxCol = vertical ? grid[0].length - 1 : grid[0].length - upperWord.length;
+          const row = Math.floor(Math.random() * (maxRow + 1));
+          const col = Math.floor(Math.random() * (maxCol + 1));
+
+          let canPlace = true;
+          for (let i = 0; i < upperWord.length; i++) {
+            const r = vertical ? row + i : row;
+            const c = vertical ? col : col + i;
+            if (grid[r][c] && grid[r][c] !== "" && grid[r][c] !== upperWord[i]) {
+              canPlace = false;
+              break;
+            }
+          }
+
+          if (canPlace) {
+            for (let i = 0; i < upperWord.length; i++) {
+              const r = vertical ? row + i : row;
+              const c = vertical ? col : col + i;
+              grid[r][c] = upperWord[i];
+            }
+            placed = true;
+          }
+        }
+      });
+    }
+
+    function renderBoard(grid) {
+      board.style.gridTemplateColumns = `repeat(${grid.length}, 40px)`;
+      board.innerHTML = "";
+      grid.forEach((row, rIdx) => {
+        row.forEach((letter, cIdx) => {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.textContent = letter;
+          cell.dataset.row = rIdx;
+          cell.dataset.col = cIdx;
+          cell.onclick = () => selectCell(cell);
+          board.appendChild(cell);
+        });
+      });
+    }
+
+    function selectCell(cell) {
+      if (cell.classList.contains("found")) return; // no seleccionar ya encontradas
+
+      const key = `${cell.dataset.row},${cell.dataset.col}`;
+      if (selectedCells.includes(key)) {
+        selectedCells = selectedCells.filter(c => c !== key);
+        cell.classList.remove("selected");
+      } else {
+        selectedCells.push(key);
+        cell.classList.add("selected");
+      }
+      checkWords();
+    }
+
+    function checkWords() {
+      // Vamos a comprobar si alguna palabra está completamente seleccionada
+      for (const word of currentLevel.words) {
+        const upperWord = word.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+
+        // Buscamos posiciones de la palabra en el tablero (horizontal o vertical)
+        const positions = [];
+
+        for (let r = 0; r < currentLevel.size; r++) {
+          for (let c = 0; c < currentLevel.size; c++) {
+            // Horizontal
+            if (c + upperWord.length <= currentLevel.size) {
+              let match = true;
+              for (let i = 0; i < upperWord.length; i++) {
+                if (boardArray[r][c + i] !== upperWord[i]) {
+                  match = false;
+                  break;
+                }
+              }
+              if (match) {
+                positions.push(Array.from({length: upperWord.length}, (_, i) => `${r},${c + i}`));
+              }
+            }
+            // Vertical
+            if (r + upperWord.length <= currentLevel.size) {
+              let match = true;
+              for (let i = 0; i < upperWord.length; i++) {
+                if (boardArray[r + i][c] !== upperWord[i]) {
+                  match = false;
+                  break;
+                }
+              }
+              if (match) {
+                positions.push(Array.from({length: upperWord.length}, (_, i) => `${r + i},${c}`));
+              }
+            }
+          }
+        }
+
+        // Verificamos si alguna de las posiciones está completamente seleccionada
+        for (const posArray of positions) {
+          const found = posArray.every(pos => selectedCells.includes(pos));
+          if (found && !foundWords.has(upperWord)) {
+            // Marcamos la palabra como encontrada
+            foundWords.add(upperWord);
+            // Cambiar estilo de las celdas
+            posArray.forEach(pos => {
+              const [r,c] = pos.split(",");
+              const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+              if (cell) {
+                cell.classList.add("found");
+                cell.classList.remove("selected");
+              }
+            });
+            // Cambiar estilo palabra lista
+            const wordElements = [...wordList.children];
+            for(const wEl of wordElements){
+              if(wEl.textContent === word){
+                wEl.classList.add("found-word");
+                break;
+              }
+            }
+            // Limpiar selección
+            selectedCells = [];
+            updateMessage();
+            checkLevelComplete();
+            return; // solo procesar una palabra por vez
+          }
+        }
+      }
+    }
+
+    function updateMessage(){
+      message.textContent = `Palabras encontradas: ${foundWords.size} / ${currentLevel.words.length}`;
+    }
+
+    function checkLevelComplete(){
+      if(foundWords.size === currentLevel.words.length){
+        if(currentLevelIndex < levels.length - 1){
+          setTimeout(() => {
+            alert(`¡Felicidades! Has completado el nivel ${currentLevelIndex + 1}. Pasando al siguiente nivel.`);
+            changeLevel(currentLevelIndex + 1);
+          }, 500);
+        } else {
+          setTimeout(() => {
+            alert("¡Felicidades! Has completado todos los niveles.");
+            message.textContent = "¡Juego completado! Gracias por jugar.";
+            board.innerHTML = "";
+            wordList.innerHTML = "";
+            title.textContent = "Juego terminado";
+          }, 500);
+        }
+      }
+    }
+
+    function renderWordList() {
+      wordList.innerHTML = currentLevel.words.map(w => `<div class="word">${w}</div>`).join("");
+    }
+
+    function changeLevel(levelIndex) {
+      currentLevelIndex = levelIndex;
+      currentLevel = levels[currentLevelIndex];
+      selectedCells = [];
+      foundWords = new Set();
+      message.textContent = "";
+      title.textContent = `Sopa de Letras - ${currentLevel.name}`;
+
+      const emptyGrid = createEmptyBoard(currentLevel.size);
+      placeWords(emptyGrid, currentLevel.words);
+      boardArray = fillRandomLetters(emptyGrid);
+
+      renderBoard(boardArray);
+      renderWordList();
+      updateMessage();
+    }
+
+    // Inicializamos el juego en nivel 1
+    let boardArray;
+    changeLevel(0);
+
+  </script>
+</body>
+</html>
+
